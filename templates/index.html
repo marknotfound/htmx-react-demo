@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width= , initial-scale=1.0">
+  <title>HTMX + React</title>
+  <script src="https://unpkg.com/htmx.org@1.8.2" integrity="sha384-+8ISc/waZcRdXCLxVgbsLzay31nCdyZXQxnsUy++HJzJliTzxKWr0m1cIEMyUzQu" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+</head>
+<body>
+  <div id="app"></div>
+  <script type="text/babel">
+    const App = () => {
+      const [htmxInnerHtml, setHtmxInnerHtml] = React.useState({__html: ""});
+
+      const loadList = async () => {
+        const response = await fetch("{{ url_for('button') }}");
+        setHtmxInnerHtml({__html: await response.text()});
+      };
+
+      React.useEffect(() => {
+        loadList();
+      }, []);
+
+      React.useEffect(() => {
+        console.log('htmx processing');
+        htmx.process(document.body);
+      });
+
+      return (
+        <div>
+          <h1>HTMX in React</h1>
+          <p>Because why not?</p>
+          <div id="HTMXContainer" dangerouslySetInnerHTML={htmxInnerHtml}></div>
+          <div id="MyList"></div>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById("app"));
+    root.render(<App />);
+  </script>
+</body>
+</html>
